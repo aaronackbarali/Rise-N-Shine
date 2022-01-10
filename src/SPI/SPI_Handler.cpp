@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include "SPI_Handler.h"
 #include "wiring_private.h"
+#include "pinDef.h"
 
 SPIClassSAMD mySPI (&sercom1, SPI_CIPO, SPI_SCK, SPI_COPI, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
 
@@ -10,7 +11,7 @@ int SPI_Handler::IfInit(void) {
   pinMode(EPD_RST_PIN, OUTPUT);
   pinMode(EPD_DC_PIN, OUTPUT);
   pinMode(EPD_BUSY_PIN, INPUT);
-  
+
   pinMode(TMC_DRV_ENN_PIN, OUTPUT);
   pinMode(TMC_CS_PIN, OUTPUT);
 
