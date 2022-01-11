@@ -2,11 +2,16 @@
 #ifndef SPIHANDLER_H
 #define SPIHANDLER_H
 
-#include <Arduino.h>
+#include <SPI.h>
+#include "./SPI/TMC/CurtainHandler.h"
 
 class SPI_Handler {
   public:
-    static int  IfInit();
+    static SPIClassSAMD mySPI;
+    static CurtainHandler curtainHandler;
+
+    SPI_Handler();
+    static void openCurtains();
 };
 
 #endif

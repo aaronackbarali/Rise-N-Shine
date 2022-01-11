@@ -24,8 +24,6 @@ bool TMC5160::begin(const PowerStageParameters &powerParams, const MotorParamete
 	iholdrun.iholddelay = 7;
 	writeRegister(TMC5160_Reg::IHOLD_IRUN, iholdrun.value);
 
-	// TODO set short detection / overcurrent protection levels
-
 	// Set initial PWM values
 	TMC5160_Reg::PWMCONF_Register pwmconf = { 0 };
 	pwmconf.value = 0xC40C001E; //Reset default
@@ -64,21 +62,13 @@ bool TMC5160::begin(const PowerStageParameters &powerParams, const MotorParamete
 	return false;
 }
 
-void TMC5160::end()
-{
+void TMC5160::end(){
 	// no-op, just stop talking....
 	; // FIXME: try and shutdown motor/chips?
 }
 
-bool TMC5160::isLastReadSuccessful()
-{
-	return _lastRegisterReadSuccess;
-}
-
-void TMC5160::setRampMode(TMC5160::RampMode mode)
-{
-	switch (mode)
-	{
+void TMC5160::setRampMode(TMC5160::RampMode mode){
+	switch (mode){
 		case POSITIONING_MODE:
 		writeRegister(TMC5160_Reg::RAMPMODE, TMC5160_Reg::POSITIONING_MODE);
 		break;
@@ -96,300 +86,48 @@ void TMC5160::setRampMode(TMC5160::RampMode mode)
 	_currentRampMode = mode;
 }
 
-float TMC5160::getCurrentPosition()
-{
-	int32_t uStepPos = readRegister(TMC5160_Reg::XACTUAL);
-
-	if ((uint32_t)(uStepPos) == 0xFFFFFFFF)
-		return NAN;
-	else
-		return (float)uStepPos / (float)_uStepCount;
-}
-
-float TMC5160::getEncoderPosition()
-{
-	int32_t uStepPos = readRegister(TMC5160_Reg::X_ENC);
-
-	if ((uint32_t)(uStepPos) == 0xFFFFFFFF)
-		return NAN;
-	else
-		return (float)uStepPos / (float)_uStepCount;
-}
-
-float TMC5160::getLatchedPosition()
-{
-	int32_t uStepPos = readRegister(TMC5160_Reg::XLATCH);
-
-	if ((uint32_t)(uStepPos) == 0xFFFFFFFF)
-		return NAN;
-	else
-		return (float)uStepPos / (float)_uStepCount;
-}
-
-float TMC5160::getLatchedEncoderPosition()
-{
-	int32_t uStepPos = readRegister(TMC5160_Reg::ENC_LATCH);
-
-	if ((uint32_t)(uStepPos) == 0xFFFFFFFF)
-		return NAN;
-	else
-		return (float)uStepPos / (float)_uStepCount;
-}
-
-float TMC5160::getTargetPosition()
-{
-	int32_t uStepPos = readRegister(TMC5160_Reg::XTARGET);
-
-	if ((uint32_t)(uStepPos) == 0xFFFFFFFF)
-		return NAN;
-	else
-		return (float)uStepPos / (float)_uStepCount;
-}
-
-float TMC5160::getCurrentSpeed()
-{
-	uint32_t data = readRegister(TMC5160_Reg::VACTUAL);
-
-	if (data == 0xFFFFFFFF)
-		return NAN;
-
-	// Returned data is 24-bits, signed => convert to 32-bits, signed.
-	if (bitRead(data, 23)) // highest bit set => negative value
-		data |= 0xFF000000;
-
-	return speedToHz(data);
-}
-
-void TMC5160::setCurrentPosition(float position, bool updateEncoderPos)
-{
+void TMC5160::setCurrentPosition(float position, bool updateEncoderPos){
 	writeRegister(TMC5160_Reg::XACTUAL, (int)(position * (float)_uStepCount));
-
-	if (updateEncoderPos)
-	{
-		writeRegister(TMC5160_Reg::X_ENC, (int)(position * (float)_uStepCount));
-		clearEncoderDeviationFlag();
-	}
 }
 
-void TMC5160::setTargetPosition(float position)
-{
+void TMC5160::setTargetPosition(float position){
 	writeRegister(TMC5160_Reg::XTARGET, (int)(position * (float)_uStepCount));
 }
 
-void TMC5160::setMaxSpeed(float speed)
-{
+void TMC5160::setMaxSpeed(float speed){
 	writeRegister(TMC5160_Reg::VMAX, speedFromHz(fabs(speed)));
 
-	if (_currentRampMode == VELOCITY_MODE)
-	{
+	if (_currentRampMode == VELOCITY_MODE){
 		writeRegister(TMC5160_Reg::RAMPMODE, speed < 0.0f ? TMC5160_Reg::VELOCITY_MODE_NEG : TMC5160_Reg::VELOCITY_MODE_POS);
 	}
 }
 
-void TMC5160::setRampSpeeds(float startSpeed, float stopSpeed, float transitionSpeed)
-{
+void TMC5160::setRampSpeeds(float startSpeed, float stopSpeed, float transitionSpeed){
 	writeRegister(TMC5160_Reg::VSTART, speedFromHz(fabs(startSpeed)));
 	writeRegister(TMC5160_Reg::VSTOP, speedFromHz(fabs(stopSpeed)));
 	writeRegister(TMC5160_Reg::V_1, speedFromHz(fabs(transitionSpeed)));
 }
 
-void TMC5160::setAcceleration(float maxAccel)
-{
-	setAccelerations(maxAccel, maxAccel, maxAccel, maxAccel);
-}
-
-void TMC5160::setAccelerations(float maxAccel, float maxDecel, float startAccel, float finalDecel)
-{
+void TMC5160::setAcceleration(float maxAccel){
 	writeRegister(TMC5160_Reg::AMAX, accelFromHz(fabs(maxAccel)));
-	writeRegister(TMC5160_Reg::DMAX, accelFromHz(fabs(maxDecel)));
-	writeRegister(TMC5160_Reg::A_1, accelFromHz(fabs(startAccel)));
-	writeRegister(TMC5160_Reg::D_1, accelFromHz(fabs(finalDecel)));
+	writeRegister(TMC5160_Reg::DMAX, accelFromHz(fabs(maxAccel)));
+	writeRegister(TMC5160_Reg::A_1, accelFromHz(fabs(maxAccel)));
+	writeRegister(TMC5160_Reg::D_1, accelFromHz(fabs(maxAccel)));
 }
 
-void TMC5160::stop()
-{
+void TMC5160::stop(){
 	// §14.2.4 Early Ramp Termination option b)
 	writeRegister(TMC5160_Reg::VSTART, 0);
 	writeRegister(TMC5160_Reg::VMAX, 0);
 }
 
-void TMC5160::disable()
-{
+void TMC5160::disable(){
 	TMC5160_Reg::CHOPCONF_Register chopconf = { 0 };
 	chopconf.value = _chopConf.value;
 	chopconf.toff = 0;
 	writeRegister(TMC5160_Reg::CHOPCONF, chopconf.value);
 }
 
-void TMC5160::enable()
-{
+void TMC5160::enable(){
 	writeRegister(TMC5160_Reg::CHOPCONF, _chopConf.value);
-}
-
-TMC5160::DriverStatus TMC5160::getDriverStatus()
-{
-	TMC5160_Reg::GSTAT_Register gstat = {0};
-	gstat.value = readRegister(TMC5160_Reg::GSTAT);
-	TMC5160_Reg::DRV_STATUS_Register drvStatus = {0};
-	drvStatus.value = readRegister(TMC5160_Reg::DRV_STATUS);
-
-	if (gstat.uv_cp)
-		return CP_UV;
-	if (drvStatus.s2vsa)
-		return S2VSA;
-	if (drvStatus.s2vsb)
-		return S2VSB;
-	if (drvStatus.s2ga)
-		return S2GA;
-	if (drvStatus.s2gb)
-		return S2GB;
-	if (drvStatus.ot)
-		return OT;
-	if (gstat.drv_err)
-		return OTHER_ERR;
-	if (drvStatus.otpw)
-		return OTPW;
-
-	return OK;
-}
-
-const char* TMC5160::getDriverStatusDescription(DriverStatus st)
-{
-	switch (st)
-	{
-		case OK: return "OK";
-		case CP_UV: return "Charge pump undervoltage";
-		case S2VSA: return "Short to supply phase A";
-		case S2VSB: return "Short to supply phase B";
-		case S2GA: return "Short to ground phase A";
-		case S2GB: return "Short to ground phase B";
-		case OT: return "Overtemperature";
-		case OTHER_ERR: return "Other driver error";
-		case OTPW: return "Overtemperature warning";
-		default: break;
-	}
-
-	return "Unknown";
-}
-
-void TMC5160::setModeChangeSpeeds(float pwmThrs, float coolThrs, float highThrs)
-{
-	writeRegister(TMC5160_Reg::TPWMTHRS, thrsSpeedToTstep(pwmThrs));
-	writeRegister(TMC5160_Reg::TCOOLTHRS, thrsSpeedToTstep(coolThrs));
-	writeRegister(TMC5160_Reg::THIGH, thrsSpeedToTstep(highThrs));
-}
-
-bool TMC5160::setEncoderResolution(int motorSteps, int encResolution, bool inverted)
-{
-	//See §22.2
-	float factor = (float)motorSteps * (float)_uStepCount / (float)encResolution;
-
-	//Check if the binary prescaler gives an exact match
-	if ((int)(factor * 65536.0f) * encResolution == motorSteps * _uStepCount * 65536)
-	{
-		TMC5160_Reg::ENCMODE_Register encmode = { 0 };
-		encmode.value = readRegister(TMC5160_Reg::ENCMODE);
-		encmode.enc_sel_decimal = false;
-		writeRegister(TMC5160_Reg::ENCMODE, encmode.value);
-
-		int32_t encConst = (int)(factor * 65536.0f);
-		if (inverted)
-			encConst = -encConst;
-		writeRegister(TMC5160_Reg::ENC_CONST, encConst);
-
-#if 0
-		Serial.println("Using binary mode");
-		Serial.print("Factor : 0x");
-		Serial.print(encConst, HEX);
-		Serial.print(" <=> ");
-		Serial.println((float)(encConst) / 65536.0f);
-#endif
-
-		return true;
-	}
-	else
-	{
-		TMC5160_Reg::ENCMODE_Register encmode = { 0 };
-		encmode.value = readRegister(TMC5160_Reg::ENCMODE);
-		encmode.enc_sel_decimal = true;
-		writeRegister(TMC5160_Reg::ENCMODE, encmode.value);
-
-		int integerPart = floor(factor);
-		int decimalPart = (int)((factor - (float)integerPart) * 10000.0f);
-		if (inverted)
-		{
-			integerPart = 65535 - integerPart;
-			decimalPart = 10000 - decimalPart;
-		}
-		int32_t encConst =  integerPart * 65536 + decimalPart;
-		writeRegister(TMC5160_Reg::ENC_CONST, encConst);
-
-#if 0
-		Serial.println("Using decimal mode");
-		Serial.print("Factor : 0x");
-		Serial.print(encConst, HEX);
-		Serial.print(" <=> ");
-		Serial.print(integerPart);
-		Serial.print(".");
-		Serial.println(decimalPart);
-#endif
-
-		//Check if the decimal prescaler gives an exact match. Floats have about 7 digits of precision so no worries here.
-		return ((int)(factor * 10000.0f) * encResolution == motorSteps * (int)_uStepCount * 10000);
-	}
-}
-
-void TMC5160::setEncoderIndexConfiguration(TMC5160_Reg::ENCMODE_sensitivity_Values sensitivity, bool nActiveHigh, bool ignorePol, bool aActiveHigh, bool bActiveHigh)
-{
-	TMC5160_Reg::ENCMODE_Register encmode = { 0 };
-	encmode.value = readRegister(TMC5160_Reg::ENCMODE);
-
-	encmode.sensitivity = sensitivity;
-	encmode.pol_N = nActiveHigh;
-	encmode.ignore_AB = ignorePol;
-	encmode.pol_A = aActiveHigh;
-	encmode.pol_B = bActiveHigh;
-
-	writeRegister(TMC5160_Reg::ENCMODE, encmode.value);
-}
-
-void TMC5160::setEncoderLatching(bool enabled)
-{
-	TMC5160_Reg::ENCMODE_Register encmode = { 0 };
-	encmode.value = readRegister(TMC5160_Reg::ENCMODE);
-
-	encmode.latch_x_act = true;
-	encmode.clr_cont = enabled;
-
-	writeRegister(TMC5160_Reg::ENCMODE, encmode.value);
-}
-
-void TMC5160::setEncoderAllowedDeviation(int steps)
-{
-	writeRegister(TMC5160_Reg::ENC_DEVIATION, steps * _uStepCount);
-}
-
-bool TMC5160::isEncoderDeviationDetected()
-{
-	TMC5160_Reg::ENC_STATUS_Register encStatus = {0};
-	encStatus.value = readRegister(TMC5160_Reg::ENC_STATUS);
-	return isLastReadSuccessful() && encStatus.deviation_warn;
-}
-
-void TMC5160::clearEncoderDeviationFlag()
-{
-	TMC5160_Reg::ENC_STATUS_Register encStatus = {0};
-	encStatus.deviation_warn = true;
-	writeRegister(TMC5160_Reg::ENC_STATUS, encStatus.value);
-}
-
-void TMC5160::setShortProtectionLevels(int s2vsLevel, int s2gLevel, int shortFilter, int shortDelay)
-{
-	TMC5160_Reg::SHORT_CONF_Register shortConf = {0};
-	shortConf.s2vs_level = constrain(s2vsLevel, 4, 15);
-	shortConf.s2g_level = constrain(s2gLevel, 2, 15);
-	shortConf.shortfilter = constrain(shortFilter, 0, 3);
-	shortConf.shortdelay = constrain(shortDelay, 0, 1);
-
-	writeRegister(TMC5160_Reg::SHORT_CONF, shortConf.value);
 }
