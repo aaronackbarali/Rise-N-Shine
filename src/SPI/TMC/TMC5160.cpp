@@ -62,11 +62,6 @@ bool TMC5160::begin(const PowerStageParameters &powerParams, const MotorParamete
 	return false;
 }
 
-void TMC5160::end(){
-	// no-op, just stop talking....
-	; // FIXME: try and shutdown motor/chips?
-}
-
 void TMC5160::setRampMode(TMC5160::RampMode mode){
 	switch (mode){
 		case POSITIONING_MODE:
@@ -113,21 +108,4 @@ void TMC5160::setAcceleration(float maxAccel){
 	writeRegister(TMC5160_Reg::DMAX, accelFromHz(fabs(maxAccel)));
 	writeRegister(TMC5160_Reg::A_1, accelFromHz(fabs(maxAccel)));
 	writeRegister(TMC5160_Reg::D_1, accelFromHz(fabs(maxAccel)));
-}
-
-void TMC5160::stop(){
-	// §14.2.4 Early Ramp Termination option b)
-	writeRegister(TMC5160_Reg::VSTART, 0);
-	writeRegister(TMC5160_Reg::VMAX, 0);
-}
-
-void TMC5160::disable(){
-	TMC5160_Reg::CHOPCONF_Register chopconf = { 0 };
-	chopconf.value = _chopConf.value;
-	chopconf.toff = 0;
-	writeRegister(TMC5160_Reg::CHOPCONF, chopconf.value);
-}
-
-void TMC5160::enable(){
-	writeRegister(TMC5160_Reg::CHOPCONF, _chopConf.value);
 }

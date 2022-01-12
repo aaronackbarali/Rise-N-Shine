@@ -16,7 +16,7 @@ SPI_Handler::SPI_Handler() {
   pinMode(TMC_DRV_ENN_PIN, OUTPUT);
   pinMode(TMC_CS_PIN, OUTPUT);
 
-  digitalWrite(TMC_DRV_ENN_PIN, LOW);
+  digitalWrite(TMC_DRV_ENN_PIN, HIGH);
 
   SPI.begin();
   pinPeripheral(SPI_COPI, PIO_SERCOM); // COPI

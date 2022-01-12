@@ -39,8 +39,6 @@ public:
 
 	virtual bool begin(const PowerStageParameters &powerParams, const MotorParameters &motorParams, MotorDirection stepperDirection);
 
-	void end();
-
 	virtual uint8_t  writeRegister(uint8_t address, uint32_t data) = 0;
 
 	/* Ramp mode selection :
@@ -55,11 +53,6 @@ public:
 	void setMaxSpeed(float speed); // Set the max speed VMAX (steps/second)
 	void setRampSpeeds(float startSpeed, float stopSpeed, float transitionSpeed); // Set the ramp start speed VSTART, ramp stop speed VSTOP, acceleration transition speed V1 (steps / second). /!\ Set VSTOP >= VSTART, VSTOP >= 0.1
 	void setAcceleration(float maxAccel); // Set the ramp acceleration / deceleration (steps / second^2)
-
-	void stop(); // Stop the current motion according to the set ramp mode and motion parameters. The max speed and start speed are set to 0 but the target position stays unchanged.
-
-	void disable(); //Disable the driver, all bridges off
-	void enable(); //Enable the driver
 
 protected:
 	static constexpr uint8_t WRITE_ACCESS = 0x80;	//Register write access for spi / uart communication
