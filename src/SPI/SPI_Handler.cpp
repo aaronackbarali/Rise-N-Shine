@@ -6,6 +6,7 @@
 SPIClassSAMD SPI_Handler::mySPI (&sercom1, SPI_CIPO, SPI_SCK, SPI_COPI, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
 CurtainHandler SPI_Handler::curtainHandler (SPI_Handler::mySPI);
 
+// Constructor: Initializes SPI pins and settings
 SPI_Handler::SPI_Handler() {
   pinMode(EPD_CS_PIN, OUTPUT);
   pinMode(EPD_RST_PIN, OUTPUT);
@@ -15,7 +16,7 @@ SPI_Handler::SPI_Handler() {
   pinMode(TMC_DRV_ENN_PIN, OUTPUT);
   pinMode(TMC_CS_PIN, OUTPUT);
 
-  digitalWrite(TMC_DRV_ENN_PIN, HIGH);
+  digitalWrite(TMC_DRV_ENN_PIN, HIGH); // TMC5160 is active:LOW
 
   SPI.begin();
   pinPeripheral(SPI_COPI, PIO_SERCOM); // COPI
@@ -23,6 +24,7 @@ SPI_Handler::SPI_Handler() {
   pinPeripheral(SPI_SCK, PIO_SERCOM);  // SCK
 }
 
+// Method: starts SPI, calls curtainHandler.OpenCurtains, ends SPI
 void SPI_Handler::openCurtains(){
   SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 

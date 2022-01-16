@@ -1,16 +1,18 @@
 
 #include "CurtainHandler.h"
 
+// Constructor: calls motor constructor
 CurtainHandler::CurtainHandler(SPIClass &spi) : _motor(TMC_CS_PIN, spi){
   digitalWrite(TMC_DRV_ENN_PIN, HIGH);
 }
 
-// Spool motor in then out 23 full rotations
+// Method: Spool motor in then out 23 full rotations
 void CurtainHandler::openCurtains() {
+  // Enable drive (active: LOW)
   digitalWrite(TMC_DRV_ENN_PIN, LOW);
   delay(1000);
 
-  TMC5160::PowerStageParameters powerStageParams; // Defaults.
+  TMC5160::PowerStageParameters powerStageParams;
   TMC5160::MotorParameters motorParams;
 
   _motor.begin(powerStageParams, motorParams, TMC5160::NORMAL_MOTOR_DIRECTION);
@@ -28,6 +30,7 @@ void CurtainHandler::openCurtains() {
   _motor.setTargetPosition(10 * 200);
   delay(20000);
 
+  // Disable drive (active: LOW)
   digitalWrite(TMC_DRV_ENN_PIN, HIGH);
   delay(1000);
 }
