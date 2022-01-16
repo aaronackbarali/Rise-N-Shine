@@ -1,9 +1,5 @@
 
-#include <Arduino.h>
 #include "CurtainHandler.h"
-#include "./SPI/pinDef.h"
-
-
 
 CurtainHandler::CurtainHandler(SPIClass &spi) : _motor(TMC_CS_PIN, spi){
   digitalWrite(TMC_DRV_ENN_PIN, HIGH);

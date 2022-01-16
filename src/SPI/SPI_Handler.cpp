@@ -1,5 +1,4 @@
 
-#include <SPI.h>
 #include "SPI_Handler.h"
 #include "wiring_private.h"
 #include "pinDef.h"
@@ -22,9 +21,12 @@ SPI_Handler::SPI_Handler() {
   pinPeripheral(SPI_COPI, PIO_SERCOM); // COPI
   pinPeripheral(SPI_CIPO, PIO_SERCOM); // CIPO
   pinPeripheral(SPI_SCK, PIO_SERCOM);  // SCK
-  //SPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 }
 
 void SPI_Handler::openCurtains(){
+  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+
   curtainHandler.openCurtains();
+
+  SPI_Handler::mySPI.endTransaction();
 }

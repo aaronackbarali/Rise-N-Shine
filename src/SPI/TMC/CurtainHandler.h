@@ -2,7 +2,10 @@
 #ifndef CURTAINAHNDLER_H
 #define CURTAINAHNDLER_H
 
+#include <Arduino.h>
+#include "./SPI/pinDef.h"
 #include "TMC5160_SPI.h"
+
 
 class CurtainHandler{
 public:
