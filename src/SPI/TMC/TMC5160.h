@@ -39,7 +39,7 @@ public:
 
 	virtual bool begin(const PowerStageParameters &powerParams, const MotorParameters &motorParams, MotorDirection stepperDirection);
 
-	virtual void  writeRegister(uint8_t address, uint32_t data) = 0;
+	virtual void writeRegister(uint8_t address, uint32_t data) = 0;
 
 	/* Ramp mode selection :
 		- Positioning mode : autonomous move to XTARGET using all A, D and V parameters.

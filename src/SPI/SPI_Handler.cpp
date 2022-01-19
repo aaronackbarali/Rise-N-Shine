@@ -5,6 +5,7 @@
 
 SPIClassSAMD SPI_Handler::mySPI (&sercom1, SPI_CIPO, SPI_SCK, SPI_COPI, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
 CurtainHandler SPI_Handler::curtainHandler (SPI_Handler::mySPI);
+EPD_Handler SPI_Handler::epdHandler (SPI_Handler::mySPI);
 
 // Constructor: Initializes SPI pins and settings
 SPI_Handler::SPI_Handler() {
@@ -29,6 +30,14 @@ void SPI_Handler::openCurtains(){
   SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 
   curtainHandler.openCurtains();
+
+  SPI_Handler::mySPI.endTransaction();
+}
+
+void SPI_Handler::printTime(){
+  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+
+  epdHandler.printTime();
 
   SPI_Handler::mySPI.endTransaction();
 }

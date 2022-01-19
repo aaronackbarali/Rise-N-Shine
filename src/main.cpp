@@ -10,7 +10,9 @@ void setup() {
   Serial.begin(9600);
   delay(10000);
 
-  spi_Handler.openCurtains();
+  //spi_Handler.openCurtains();
+  spi_Handler.printTime();
+
   // Serial.println("starting");
   // timeHandler.initializeTime();
   // Serial.println(timeHandler.printTime());

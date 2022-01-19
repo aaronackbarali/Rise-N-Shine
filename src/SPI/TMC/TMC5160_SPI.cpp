@@ -1,8 +1,8 @@
 
-#include "TMC5160.h"
+//#include "TMC5160.h"
 #include "TMC5160_SPI.h"
 
-uint8_t CS; // TMC5160 Chip Select Pin #
+uint8_t TMC5160_SPI::CS; // TMC5160 Chip Select Pin #
 
 // Constructor: Sets chip select pin and gets SPI object for transfers
 TMC5160_SPI::TMC5160_SPI(uint8_t chipSelectPin, SPIClass &spi) : _spi(&spi) {

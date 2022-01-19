@@ -11,4 +11,6 @@ public:
 	void writeRegister(uint8_t address, uint32_t data);
 private:
 	SPIClass *_spi;
+	static uint8_t CS;
+
 };
