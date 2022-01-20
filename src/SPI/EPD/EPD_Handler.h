@@ -13,7 +13,10 @@ public:
   //  Constructor:
   EPD_Handler(SPIClass& spi = SPI);
 
-  // Method: prints current time HH:MM
+  // Method: Clears display
+  void clearDisplay();
+
+  // Method: Prints current time HH:MM
   void printTime();
 
 private:

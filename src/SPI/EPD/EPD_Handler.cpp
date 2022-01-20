@@ -16,13 +16,15 @@ EPD_Handler::EPD_Handler(SPIClass &spi) :
   _paint(){
 }
 
+void EPD_Handler::clearDisplay(){
+  _epd.ClearFrameMemory(0xFF);
+  _epd.DisplayFrame();
+}
+
 void EPD_Handler::printTime(){
   _epd.Init();
 
-  _epd.ClearFrameMemory(0xFF);
-  _epd.DisplayFrame();
-
-  delay(2000);
+  delay(100);
 
   _paint.SetRotate(ROTATE_90);
   _paint.SetWidth(64); // height since rotated 90
