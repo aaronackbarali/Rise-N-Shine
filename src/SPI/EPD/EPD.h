@@ -11,6 +11,7 @@
 
 class EPD {
   public:
+    unsigned char buffer[4736];
     unsigned long width;
     unsigned long height;
 
@@ -28,6 +29,13 @@ class EPD {
       unsigned int image_height
     );
     void SetFrameMemory_Partial(
+      const unsigned char* image_buffer,
+      unsigned int x,
+      unsigned int y,
+      unsigned int image_width,
+      unsigned int image_height
+    );
+    void SetFrameMemory_Base(
       const unsigned char* image_buffer,
       unsigned int x,
       unsigned int y,

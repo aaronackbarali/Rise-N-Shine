@@ -25,10 +25,16 @@ public:
 
   // Return Internal clock time to as a string
   String printTime() {
-    String vTime = "Internal Time: ";
-    vTime.concat(getHours());
+    String HH = getHours() < 10 ? "0" : "";
+    HH.concat(getHours());
+
+    String MM = getMinutes() < 10 ? "0" : "";
+    MM.concat(getMinutes());
+
+    String vTime = "";
+    vTime.concat(HH);
     vTime.concat(":");
-    vTime.concat(getMinutes());
+    vTime.concat(MM);
     return vTime;
   }
 
@@ -38,6 +44,10 @@ public:
 
   int getMinutes() {
     return ((easternTime() % 3600) / 60);
+  }
+
+  int getSeconds() {
+    return (easternTime() % 60);
   }
 
   unsigned long easternTime() {

@@ -12,8 +12,11 @@ EPD_Handler::EPD_Handler(SPIClass &spi) :
     EPD_RST_PIN,
     EPD_BUSY_PIN,
     spi
-  ),
-  _paint(){
+  ), _paint(), _timeHandler(){
+}
+
+void EPD_Handler::initializeDisplay(){
+  _epd.Init();
 }
 
 void EPD_Handler::clearDisplay(){
@@ -21,18 +24,37 @@ void EPD_Handler::clearDisplay(){
   _epd.DisplayFrame();
 }
 
-void EPD_Handler::printTime(){
+void EPD_Handler::initializeTime(){
+  _timeHandler.initializeTime();
+}
+
+void EPD_Handler::printTime(bool full){
   _epd.Init();
 
-  delay(100);
+  // changed to MM:SS for debugging
+  String MM = _timeHandler.getMinutes() < 10 ? "0" : "";
+  MM.concat(_timeHandler.getMinutes());
+
+  String vTime = _timeHandler.getHours() < 10 ? "0" : "";
+  vTime.concat(_timeHandler.getHours());
+  vTime.concat(":");
+  vTime.concat(MM);
 
   _paint.SetRotate(ROTATE_90);
   _paint.SetWidth(64); // height since rotated 90
-  _paint.SetHeight(96); // width since rotated 90
+  _paint.SetHeight(240); // width since rotated 90
 
   _paint.Clear(UNCOLORED);
-  _paint.DrawStringAt(0, 0, "12", &fontLS_64, COLORED);
+  _paint.DrawStringAt(0, 0, vTime, &fontLS_64, COLORED);
 
-  _epd.SetFrameMemory(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
-  _epd.DisplayFrame();
+  if(full){
+    _epd.SetFrameMemory(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
+    _epd.DisplayFrame();
+  } else {
+    _epd.SetFrameMemory_Partial(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
+    _epd.DisplayFrame_Partial();
+  }
+
+  _epd.SetFrameMemory_Base(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
+  _epd.Sleep();
 }

@@ -2,9 +2,7 @@
 #include <avr/pgmspace.h>
 #include "Paint.h"
 
-/**
-    @brief: clear the image
-*/
+// Method: clear the image
 void Paint::Clear(int colored) {
   for (int x = 0; x < this->width; x++) {
     for (int y = 0; y < this->height; y++) {
@@ -13,10 +11,8 @@ void Paint::Clear(int colored) {
   }
 }
 
-/**
-    @brief: this draws a pixel by absolute coordinates.
-            this function won't be affected by the rotate parameter.
-*/
+// Method: this draws a pixel by absolute coordinates
+// this function won't be affected by the rotate parameter
 void Paint::DrawAbsolutePixel(int x, int y, int colored) {
   if (x < 0 || x >= this->width || y < 0 || y >= this->height) {
     return;
@@ -27,13 +23,9 @@ void Paint::DrawAbsolutePixel(int x, int y, int colored) {
   } else {
     image[(x + y * this->width) / 8] |= 0x80 >> (x % 8);
   }
-
 }
 
-/**
-    @brief: Getters and Setters
-*/
-unsigned char* Paint::GetImage(void) {
+unsigned char* Paint::GetImage() {
   return this->image;
 }
 
@@ -127,20 +119,19 @@ void Paint::DrawCharAt(int x, int y, char ascii_char, sFONT* font, int colored) 
 /**
    @brief: this displays a string on the frame buffer but not refresh
 */
-void Paint::DrawStringAt(int x, int y, const char* text, sFONT* font, int colored) {
-  const char* p_text = text;
-  unsigned int counter = 0;
-  int refcolumn = x;
+void Paint::DrawStringAt(int x, int y, String text, sFONT* font, int colored) {
+  // unsigned int counter = 0;
+   int refcolumn = x;
 
   /* Send the string character by character on EPD */
-  while (*p_text != 0) {
+  for (unsigned int i = 0; i < text.length();i++) {
     /* Display one character on EPD */
-    DrawCharAt(refcolumn, y, *p_text, font, colored);
+    DrawCharAt(refcolumn, y, text.charAt(i), font, colored);
     /* Decrement the column position by 16 */
     refcolumn += font->Width;
-    /* Point on the next character */
-    p_text++;
-    counter++;
+    // /* Point on the next character */
+    // p_text++;
+    // counter++;
   }
 }
 

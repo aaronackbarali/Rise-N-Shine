@@ -18,8 +18,18 @@ class SPI_Handler {
 
     // Method: Handles curtain opening
     static void openCurtains();
+
     // Method:
-    static void printTime();
+    static void initializeDisplay();
+
+    // Method:
+    static void clearDisplay();
+
+    // Method:
+    static void initializeTime();
+
+    // Method:
+    static void printTime(bool full);
 };
 
 #endif
