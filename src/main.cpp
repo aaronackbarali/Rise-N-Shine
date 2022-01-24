@@ -7,11 +7,8 @@ SPI_Handler spi_Handler;
 void setup() {
   delay(10000);
 
-  spi_Handler.openCurtains();
-
   spi_Handler.initializeTime();
   spi_Handler.initializeDisplay();
-  spi_Handler.clearDisplay();
   spi_Handler.printTime(true);
 }
 

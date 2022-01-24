@@ -24,12 +24,6 @@ public:
     setTime(getEpochTime());
   }
 
-  // Method: Try to update the time (10 tries)
-  void updateTime(){
-    NTP::updateTime(false);
-    setTime(getEpochTime());
-  }
-
   // return date as MMDDhhmm
   int UTC_Timestamp(){
     int timestamp = month() * 1000000;
@@ -67,26 +61,24 @@ public:
     return ((easternTime() % 3600) / 60);
   }
 
-  int getSeconds() {
-    return (easternTime() % 60);
-  }
-
   int getFormattedTime(){
     return getHours() * 100 + getMinutes();
   }
 
-  // Return internal clock time as a string
+  // Method: Return internal clock time as a string
   String printTime() {
-    String HH = getHours() < 10 ? "0" : "";
-    HH.concat(getHours());
+    // Update time if last update was more than 30 minutes ago
+    if( (millis() - _lastUpdate) > 1800000 ){
+      NTP::updateTime(false);
+      setTime(getEpochTime());
+    }
 
-    String MM = getMinutes() < 10 ? "0" : "";
-    MM.concat(getMinutes());
-
-    String vTime = "";
-    vTime.concat(HH);
+    String vTime = getHours() < 10 ? "0" : "";
+    vTime.concat(getHours());
     vTime.concat(":");
-    vTime.concat(MM);
+    vTime.concat(getMinutes() < 10 ? "0" : "");
+    vTime.concat(getMinutes());
+
     return vTime;
   }
 };

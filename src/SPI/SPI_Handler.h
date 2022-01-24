@@ -23,9 +23,6 @@ class SPI_Handler {
     static void initializeDisplay();
 
     // Method:
-    static void clearDisplay();
-
-    // Method:
     static void initializeTime();
 
     // Method:

@@ -17,9 +17,6 @@ EPD_Handler::EPD_Handler(SPIClass &spi) :
 
 void EPD_Handler::initializeDisplay(){
   _epd.Init();
-}
-
-void EPD_Handler::clearDisplay(){
   _epd.ClearFrameMemory(0xFF);
   _epd.DisplayFrame();
 }
@@ -31,14 +28,7 @@ void EPD_Handler::initializeTime(){
 void EPD_Handler::printTime(bool full){
   _epd.Init();
 
-  // changed to MM:SS for debugging
-  String MM = _timeHandler.getMinutes() < 10 ? "0" : "";
-  MM.concat(_timeHandler.getMinutes());
-
-  String vTime = _timeHandler.getHours() < 10 ? "0" : "";
-  vTime.concat(_timeHandler.getHours());
-  vTime.concat(":");
-  vTime.concat(MM);
+  String vTime = _timeHandler.printTime();
 
   _paint.SetRotate(ROTATE_90);
   _paint.SetWidth(64); // height since rotated 90

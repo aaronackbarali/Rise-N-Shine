@@ -42,14 +42,6 @@ void SPI_Handler::initializeDisplay(){
   SPI_Handler::mySPI.endTransaction();
 }
 
-void SPI_Handler::clearDisplay(){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
-
-  epdHandler.clearDisplay();
-
-  SPI_Handler::mySPI.endTransaction();
-}
-
 void SPI_Handler::initializeTime(){
   SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 

@@ -8,19 +8,16 @@
 #include "Paint.h"
 #include "./Time/TimeHandler.h"
 
-// Class: abstracts e-paper display commands away from the SPI Handler
+// Class: Abstracts e-paper display commands away from the SPI Handler
 class EPD_Handler{
 public:
   //  Constructor:
   EPD_Handler(SPIClass& spi = SPI);
 
-  // Method:
+  // Method: Initializes and clears display
   void initializeDisplay();
 
-  // Method: Clears display
-  void clearDisplay();
-
-  // Method:
+  // Method: Initilizes time
   void initializeTime();
 
   // Method: Prints current time HH:MM
