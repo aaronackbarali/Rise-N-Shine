@@ -42,15 +42,6 @@ public:
     return WiFi.status() == WL_CONNECTED ? 1 : 0;
   }
 
-  // Send emails for notifying startup status and verbose errors
-  // void sendEmail(String notification) {
-  //   EMailSender::EMailMessage message;
-  //   message.subject = "RiseNShine - Notification";
-  //   message.message = notification;
-  //   emailSender.send("aarona493@gmail.com", message);
-  //
-  //   delay(5000);
-  // }
 };
 
 #endif

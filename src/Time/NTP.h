@@ -40,17 +40,6 @@ public:
         }
         delay(1000);
       }
-      if (!timeSynced) {
-        //sendEmail("Couldn't sync time.");
-      }
-    }
-
-    if (startup) {
-      // String startupNote = "Startup complete. Synced time ";
-      // startupNote.concat(getHours());
-      // startupNote.concat(":");
-      // startupNote.concat(getMinutes());
-      // sendEmail(startupNote);
     }
 
     disconnectFromWifi();
