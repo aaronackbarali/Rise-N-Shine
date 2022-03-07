@@ -21,8 +21,6 @@ public:
   void updateTime(boolean startup) {
     connectToWifi();
 
-    boolean timeSynced = false;
-
     // When starting up, loop until time is retrieved
     if (startup) {
       while (true) {
@@ -35,7 +33,6 @@ public:
       // Try getting time 10 times
       for (byte i = 0; i < 10; i++) {
         if (getNTPTime()) {
-          timeSynced = true;
           break;
         }
         delay(1000);
