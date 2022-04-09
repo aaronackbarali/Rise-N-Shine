@@ -21,7 +21,13 @@ public:
   void initializeTime();
 
   // Method: Prints current time HH:MM
+  int getTime();
+
+  // Method: Prints current time HH:MM
   void printTime(bool full);
+
+  // Method: Prints a string, font 24pt
+  void print24(String str);
 
 private:
 	EPD_SPI _epd;

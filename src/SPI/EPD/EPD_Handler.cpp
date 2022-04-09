@@ -25,6 +25,12 @@ void EPD_Handler::initializeTime(){
   _timeHandler.initializeTime();
 }
 
+int EPD_Handler::getTime(){
+  _epd.Init();
+
+  return _timeHandler.getHours() * 100 + _timeHandler.getMinutes();
+}
+
 void EPD_Handler::printTime(bool full){
   _epd.Init();
 
@@ -44,6 +50,23 @@ void EPD_Handler::printTime(bool full){
     _epd.SetFrameMemory_Partial(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
     _epd.DisplayFrame_Partial();
   }
+
+  _epd.SetFrameMemory_Base(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
+  _epd.Sleep();
+}
+
+void EPD_Handler::print24(String str){
+  _epd.Init();
+
+  _paint.SetRotate(ROTATE_90);
+  _paint.SetWidth(24); // height since rotated 90
+  _paint.SetHeight(296); // width since rotated 90
+
+  _paint.Clear(UNCOLORED);
+  _paint.DrawStringAt(0, 0, str, &fontLS_24, COLORED);
+
+  _epd.SetFrameMemory(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
+  _epd.DisplayFrame();
 
   _epd.SetFrameMemory_Base(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
   _epd.Sleep();

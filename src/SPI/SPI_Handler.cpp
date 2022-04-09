@@ -50,10 +50,30 @@ void SPI_Handler::initializeTime(){
   SPI_Handler::mySPI.endTransaction();
 }
 
+int SPI_Handler::getTime(){
+  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+
+  int t = epdHandler.getTime();
+
+  SPI_Handler::mySPI.endTransaction();
+
+  return t;
+}
+
 void SPI_Handler::printTime(bool full){
   SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 
   epdHandler.printTime(full);
+
+  SPI_Handler::mySPI.endTransaction();
+}
+
+void SPI_Handler::print(String str, int pt){
+  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+
+  if (pt == 24) {
+    epdHandler.print24(str);
+  }
 
   SPI_Handler::mySPI.endTransaction();
 }

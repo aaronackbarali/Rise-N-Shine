@@ -25,8 +25,13 @@ class SPI_Handler {
     // Method:
     static void initializeTime();
 
+    static int getTime();
+
     // Method:
     static void printTime(bool full);
+
+    // Method:
+    static void print(String str, int pt);
 };
 
 #endif
