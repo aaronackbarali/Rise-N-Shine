@@ -21,7 +21,7 @@ void CurtainHandler::openCurtains() {
 
   _motor.begin(powerStageParams, motorParams, TMC5160::NORMAL_MOTOR_DIRECTION);
 
-  _motor.setMaxSpeed(200);     // Steps per second
+  _motor.setMaxSpeed(20);     // Steps per second
   _motor.setAcceleration(20);  // Steps per second^2
 
   delay(1000); // Standstill for automatic tuning

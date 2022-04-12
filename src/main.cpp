@@ -33,9 +33,7 @@ void loop() {
   vNow = spi_Handler.getTime();
 
   if (alarm - delta <= vNow && vNow <= alarm + delta ) {
-    spi_Handler.print("Rise N' Shine", 24);
     spi_Handler.openCurtains();
     fullRefreshTrigger = 5;
   }
-
 }
