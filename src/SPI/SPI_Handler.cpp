@@ -3,77 +3,78 @@
 #include "wiring_private.h"
 #include "pinDef.h"
 
-SPIClassSAMD SPI_Handler::mySPI (&sercom1, SPI_CIPO, SPI_SCK, SPI_COPI, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
-CurtainHandler SPI_Handler::curtainHandler (SPI_Handler::mySPI);
-EPD_Handler SPI_Handler::epdHandler (SPI_Handler::mySPI);
+#include "TMC/CurtainHandler.h"
+#include "EPD/EPD_Handler.h"
+#include "Time/TimeHandler.h"
 
-// Constructor: Initializes SPI pins and settings
-SPI_Handler::SPI_Handler() {
+static SPIClassSAMD mySPI(&sercom1, SPI_CIPO, SPI_SCK, SPI_COPI, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
+static CurtainHandler curtainHandler(mySPI);
+static EPD_Handler epdHandler(mySPI);
+static TimeHandler timeHandler;
+
+// Constructor: Initializes non-SPI but comms req pins
+SPI_Handler::SPI_Handler(){
+  pinMode(EPD_BUSY_PIN, INPUT);
+
   pinMode(EPD_CS_PIN, OUTPUT);
   pinMode(EPD_RST_PIN, OUTPUT);
   pinMode(EPD_DC_PIN, OUTPUT);
-  pinMode(EPD_BUSY_PIN, INPUT);
 
-  pinMode(TMC_DRV_ENN_PIN, OUTPUT);
+  pinMode(TMC_PWR_A, OUTPUT);
+  pinMode(TMC_PWR_B, OUTPUT);
+  pinMode(TMC_PWR_C, OUTPUT);
   pinMode(TMC_CS_PIN, OUTPUT);
 
-  digitalWrite(TMC_DRV_ENN_PIN, HIGH); // TMC5160 is active:LOW
+  digitalWrite(TMC_PWR_A, LOW);
+  digitalWrite(TMC_PWR_B, LOW);
+  digitalWrite(TMC_PWR_C, LOW);
+  digitalWrite(TMC_CS_PIN, LOW);
 
   SPI.begin();
-  pinPeripheral(SPI_COPI, PIO_SERCOM); // COPI
-  pinPeripheral(SPI_CIPO, PIO_SERCOM); // CIPO
-  pinPeripheral(SPI_SCK, PIO_SERCOM);  // SCK
+
+  pinPeripheral(SPI_COPI, PIO_SERCOM);
+  pinPeripheral(SPI_CIPO, PIO_SERCOM);
+  pinPeripheral(SPI_SCK, PIO_SERCOM);
+}
+
+// Method: Initial time sync, exits loop only when sync achieved
+void SPI_Handler::initializeTime(){
+  timeHandler.initializeTime();
+}
+
+// Method: Gets internal time (format HHMM). Will sync time if 30min since last synced
+int SPI_Handler::getTime(){
+  return timeHandler.getTime();
+}
+
+// Method: Returns internal time formatted as HH:MM
+String SPI_Handler::formatTime(){
+  return timeHandler.formatTime();
 }
 
 // Method: starts SPI, calls curtainHandler.OpenCurtains, ends SPI
 void SPI_Handler::openCurtains(){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 
   curtainHandler.openCurtains();
 
-  SPI_Handler::mySPI.endTransaction();
+  mySPI.endTransaction();
 }
 
+// Method: Initializes display, soft reset
 void SPI_Handler::initializeDisplay(){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+  mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 
   epdHandler.initializeDisplay();
 
-  SPI_Handler::mySPI.endTransaction();
+  mySPI.endTransaction();
 }
 
-void SPI_Handler::initializeTime(){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
+// Method: Prints string, 64pt. Boolean for full or patrial refresh
+void SPI_Handler::print64(String str, bool full){
+  mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 
-  epdHandler.initializeTime();
+  epdHandler.print64(str, full);
 
-  SPI_Handler::mySPI.endTransaction();
-}
-
-int SPI_Handler::getTime(){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
-
-  int t = epdHandler.getTime();
-
-  SPI_Handler::mySPI.endTransaction();
-
-  return t;
-}
-
-void SPI_Handler::printTime(bool full){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
-
-  epdHandler.printTime(full);
-
-  SPI_Handler::mySPI.endTransaction();
-}
-
-void SPI_Handler::print(String str, int pt){
-  SPI_Handler::mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
-
-  if (pt == 24) {
-    epdHandler.print24(str);
-  }
-
-  SPI_Handler::mySPI.endTransaction();
+  mySPI.endTransaction();
 }

@@ -4,9 +4,8 @@
 
 #include <Arduino.h>
 #include "./SPI/pinDef.h"
-#include "EPD_SPI.h"
+#include "EPD.h"
 #include "Paint.h"
-#include "./Time/TimeHandler.h"
 
 // Class: Abstracts e-paper display commands away from the SPI Handler
 class EPD_Handler{
@@ -17,22 +16,15 @@ public:
   // Method: Initializes and clears display
   void initializeDisplay();
 
-  // Method: Initilizes time
-  void initializeTime();
-
-  // Method: Prints current time HH:MM
-  int getTime();
-
-  // Method: Prints current time HH:MM
-  void printTime(bool full);
+  // Method: Prints a string, font 64pt
+  void print64(String str, bool full);
 
   // Method: Prints a string, font 24pt
   void print24(String str);
 
 private:
-	EPD_SPI _epd;
+	EPD _epd;
   Paint _paint;
-  TimeHandler _timeHandler;
 };
 
 #endif

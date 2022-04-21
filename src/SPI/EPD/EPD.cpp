@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include "EPD.h"
 #include "imageData.h"
+#include "./SPI/pinDef.h"
 
-EPD::EPD() {
+EPD::EPD(SPIClass &spi) : _spi(&spi) {
   width = EPD_WIDTH;
   height = EPD_HEIGHT;
 };
@@ -13,6 +14,7 @@ void EPD::Init() {
 
   WaitUntilIdle();
   SendCommand(0x12);  // Software reset
+  Serial.println("here");
   WaitUntilIdle();
 
   SendCommand(0x01); // Driver output control
@@ -22,7 +24,6 @@ void EPD::Init() {
 
   SendCommand(0x11); // Data entry mode
   SendData(0x03);
-
   SetMemoryArea(0, 0, width - 1, height - 1);
 
   SendCommand(0x21); // Display update control
@@ -107,9 +108,9 @@ void EPD::SetFrameMemory_Partial(
     y_end = y + image_height - 1;
   }
 
-  digitalWrite(reset_pin, LOW);
+  digitalWrite(EPD_RST_PIN, LOW);
   delay(2);
-  digitalWrite(reset_pin, HIGH);
+  digitalWrite(EPD_RST_PIN, HIGH);
   delay(2);
 
   SetLut(_WF_PARTIAL_2IN9);
@@ -331,4 +332,40 @@ void EPD::SetMemoryPointer(int x, int y) {
 void EPD::Sleep() {
   SendCommand(0x10);
   SendData(0x01);
+}
+
+// Method: Send a command to the EPD
+void EPD::SendCommand(unsigned char command) {
+  digitalWrite(EPD_DC_PIN, LOW);
+  digitalWrite(EPD_CS_PIN, LOW);
+  _spi->transfer(command);
+  digitalWrite(EPD_CS_PIN, HIGH);
+}
+
+// Method: Send a byte of data to the EPD
+void EPD::SendData(unsigned char dat) {
+  digitalWrite(EPD_DC_PIN, HIGH);
+  digitalWrite(EPD_CS_PIN, LOW);
+  _spi->transfer(dat);
+  digitalWrite(EPD_CS_PIN, HIGH);
+}
+
+// Method: Module reset. Used to awaken the module in deep sleep. See Epd::Sleep();
+void EPD::Reset() {
+  digitalWrite(EPD_RST_PIN, HIGH);
+  delay(20);
+  digitalWrite(EPD_RST_PIN, LOW);
+  delay(5);
+  digitalWrite(EPD_RST_PIN, HIGH);
+  delay(20);
+}
+
+// Method: Wait until the busy_pin goes LOW
+void EPD::WaitUntilIdle() {
+  while (1) {	 //=1 BUSY
+    if (digitalRead(EPD_BUSY_PIN) == LOW)
+      break;
+    delay(5);
+  }
+  delay(5);
 }

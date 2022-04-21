@@ -2,7 +2,6 @@
 #ifndef EPD2IN9_V2_H
 #define EPD2IN9_V2_H
 
-#include <Arduino.h>
 #include <SPI.h>
 
 // Display resolution
@@ -15,12 +14,12 @@ class EPD {
     unsigned long width;
     unsigned long height;
 
-    EPD();
+    EPD(SPIClass& spi = SPI);
     void Init();
-    virtual void SendCommand(unsigned char command) = 0;
-    virtual void SendData(unsigned char data) = 0;
-    virtual void WaitUntilIdle() = 0;
-    virtual void Reset() = 0;
+    void SendCommand(unsigned char command);
+    void SendData(unsigned char data);
+    void WaitUntilIdle();
+    void Reset();
     void SetFrameMemory(
       const unsigned char* image_buffer,
       unsigned int x,
@@ -50,10 +49,7 @@ class EPD {
     void Sleep();
 
   private:
-    unsigned int reset_pin;
-    unsigned int dc_pin;
-    unsigned int cs_pin;
-    unsigned int busy_pin;
+    SPIClass *_spi;
 
     void SetLut(unsigned char *lut);
     void SetLut_by_host(unsigned char *lut);

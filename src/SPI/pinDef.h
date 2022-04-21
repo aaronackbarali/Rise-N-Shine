@@ -9,8 +9,9 @@
 #define EPD_DC_PIN           7
 #define EPD_CS_PIN           8
 
-#define TMC_PWR_EN           4
-#define TMC_DRV_ENN_PIN      9
+#define TMC_PWR_A            2
+#define TMC_PWR_B            3
+#define TMC_PWR_C            4
 #define TMC_CS_PIN           10
 
 #define SPI_COPI             11

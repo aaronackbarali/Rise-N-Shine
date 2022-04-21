@@ -9,8 +9,8 @@
 class TimeHandler : public NTP {
 public:
   // EDT from second Sunday in March to first Sunday in November
-  int EDT_Offset = -14400; // UTC-4 hours
-  int EST_Offset = -18000; // UTC-5 hours
+  const int EDT_Offset = -14400; // UTC-4 hours
+  const int EST_Offset = -18000; // UTC-5 hours
 
   // Method: Return the epoch
   unsigned long getEpochTime() {
@@ -24,7 +24,7 @@ public:
     setTime(getEpochTime());
   }
 
-  // return date as MMDDhhmm
+  // Method: Returns date as MMDDhhmm
   int UTC_Timestamp(){
     int timestamp = month() * 1000000;
     timestamp += day() * 10000;
@@ -33,6 +33,7 @@ public:
     return timestamp;
   }
 
+  // Method: Returns the offset needed for eastern timezone
   int DST_Offset(){
     int vDate = UTC_Timestamp();
 
@@ -49,30 +50,34 @@ public:
     return EST_Offset;
   }
 
+  // Method: Gets internal time, returns in eastern timezone
   unsigned long easternTime() {
     return getEpochTime() + DST_Offset();
   }
 
+  // Method: Gets internal hours
   int getHours() {
     return ((easternTime() % 86400L) / 3600);
   }
 
+  // Method: Gets internal minutes
   int getMinutes() {
     return ((easternTime() % 3600) / 60);
   }
 
-  int getFormattedTime(){
-    return getHours() * 100 + getMinutes();
-  }
-
-  // Method: Return internal clock time as a string
-  String printTime() {
+  // Method: Gets time HHMM
+  int getTime() {
     // Update time if last update was more than 30 minutes ago
     if( (millis() - _lastUpdate) > 1800000 ){
       NTP::updateTime(false);
       setTime(getEpochTime());
     }
 
+    return getHours() * 100 + getMinutes();
+  }
+
+  // Method: Returns internal time formatted as HH:MM
+  String formatTime() {
     String vTime = getHours() < 10 ? "0" : "";
     vTime.concat(getHours());
     vTime.concat(":");

@@ -4,15 +4,8 @@
 #define COLORED     1
 #define UNCOLORED   0
 
-// Constructor: calls motor constructor
-EPD_Handler::EPD_Handler(SPIClass &spi) :
-  _epd(
-    EPD_CS_PIN,
-    EPD_DC_PIN,
-    EPD_RST_PIN,
-    EPD_BUSY_PIN,
-    spi
-  ), _paint(), _timeHandler(){
+// Constructor:
+EPD_Handler::EPD_Handler(SPIClass &spi) : _epd(spi), _paint() {
 }
 
 void EPD_Handler::initializeDisplay(){
@@ -21,27 +14,15 @@ void EPD_Handler::initializeDisplay(){
   _epd.DisplayFrame();
 }
 
-void EPD_Handler::initializeTime(){
-  _timeHandler.initializeTime();
-}
-
-int EPD_Handler::getTime(){
+void EPD_Handler::print64(String str, bool full){
   _epd.Init();
-
-  return _timeHandler.getHours() * 100 + _timeHandler.getMinutes();
-}
-
-void EPD_Handler::printTime(bool full){
-  _epd.Init();
-
-  String vTime = _timeHandler.printTime();
 
   _paint.SetRotate(ROTATE_90);
   _paint.SetWidth(64); // height since rotated 90
   _paint.SetHeight(240); // width since rotated 90
 
   _paint.Clear(UNCOLORED);
-  _paint.DrawStringAt(0, 0, vTime, &fontLS_64, COLORED);
+  _paint.DrawStringAt(0, 0, str, &fontLS_64, COLORED);
 
   if(full){
     _epd.SetFrameMemory(_paint.GetImage(), 0, 0, _paint.GetWidth(), _paint.GetHeight());
