@@ -1,5 +1,4 @@
 
-#include <Arduino.h>
 #include "./SPI/SPI_Handler.h"
 
 static SPI_Handler spi_Handler;
