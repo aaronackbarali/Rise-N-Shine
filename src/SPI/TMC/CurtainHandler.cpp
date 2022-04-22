@@ -2,7 +2,7 @@
 #include "CurtainHandler.h"
 
 // Constructor: calls motor constructor
-CurtainHandler::CurtainHandler(SPIClass &spi) : _motor(TMC_CS_PIN, spi){
+CurtainHandler::CurtainHandler(SPIClass &spi) : motor(spi){
 }
 
 // Method: Spool motor in then out 23 full rotations
@@ -16,17 +16,17 @@ void CurtainHandler::openCurtains() {
   TMC5160::PowerStageParameters powerStageParams;
   TMC5160::MotorParameters motorParams;
 
-  _motor.begin(powerStageParams, motorParams, TMC5160::NORMAL_MOTOR_DIRECTION);
+  motor.begin(powerStageParams, motorParams, TMC5160::NORMAL_MOTOR_DIRECTION);
 
-  _motor.setMaxSpeed(20);     // Steps per second
-  _motor.setAcceleration(20);  // Steps per second^2
+  motor.setMaxSpeed(20);     // Steps per second
+  motor.setAcceleration(20);  // Steps per second^2
 
   delay(1000); // Standstill for automatic tuning
-  // _motor.setTargetPosition(23 * 200); // 23 turns
+  // motor.setTargetPosition(23 * 200); // 23 turns
   // delay(23 * 10 * 1000 + 10000); // (23 revs * 10s/rev) + 10s (acc)deceleration buffer
-  // _motor.setTargetPosition(0); // 23 turns back
+  // motor.setTargetPosition(0); // 23 turns back
   // delay(23 * 10 * 1000 + 10000);
-  _motor.setTargetPosition(100);
+  motor.setTargetPosition(100);
   delay(10000);
 
   // Disable power

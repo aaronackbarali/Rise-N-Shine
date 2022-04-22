@@ -1,6 +1,26 @@
 
 #include "TMC5160.h"
 
+TMC5160::TMC5160(SPIClass &spi) : spi(&spi) {
+};
+
+// Method: Transfers data to the TMC5160
+void TMC5160::writeRegister(uint8_t address, uint32_t data){
+	// Select TMC5160 (active:LOW)
+	digitalWrite(TMC_CS_PIN, LOW);
+	delay(1);
+
+	// Send new register value
+	spi->transfer(address | WRITE_ACCESS);
+	spi->transfer((data & 0xFF000000) >> 24);
+	spi->transfer((data & 0xFF0000) >> 16);
+	spi->transfer((data & 0xFF00) >> 8);
+	spi->transfer(data & 0xFF);
+
+	// Unselect TMC5160 (active:LOW)
+	digitalWrite(TMC_CS_PIN, HIGH);
+}
+
 bool TMC5160::begin(const PowerStageParameters &powerParams, const MotorParameters &motorParams, MotorDirection stepperDirection )
 {
 	/* Clear the reset and charge pump undervoltage flags */

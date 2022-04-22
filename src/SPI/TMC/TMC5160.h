@@ -2,12 +2,14 @@
 #ifndef TMC5160_H
 #define TMC5160_H
 
-#include <Arduino.h>
 #include <SPI.h>
 #include "TMC5160_registers.h"
+#include "./SPI/pinDef.h"
 
 class TMC5160 {
 public:
+	SPIClass *spi;
+
 	static constexpr uint8_t IC_VERSION = 0x30;
 	static constexpr uint32_t DEFAULT_F_CLK = 12000000; // Typical internal clock frequency in Hz.
 
@@ -29,6 +31,12 @@ public:
 		uint8_t pwmGradInitial = 0; // initial stealthChop velocity dependent gradient for PWM amplitude
 	};
 
+	// Constructor:
+	TMC5160(SPIClass& spi);
+
+	// Method: Transfers data to the TMC5160
+	void writeRegister(uint8_t address, uint32_t data);
+
 	/* Start the motor driver using the specified parameters.
 	 * These should be tuned according to the power stage and motor used.
 	 * Look in the examples for a config wizard.
@@ -36,10 +44,8 @@ public:
 	 * motorParams : motor current parameters
 	 * stepperDirection : normal / inverted
 	 */
-
 	virtual bool begin(const PowerStageParameters &powerParams, const MotorParameters &motorParams, MotorDirection stepperDirection);
 
-	virtual void writeRegister(uint8_t address, uint32_t data) = 0;
 
 	/* Ramp mode selection :
 		- Positioning mode : autonomous move to XTARGET using all A, D and V parameters.
@@ -67,7 +73,6 @@ private:
 	// v[Hz] = v[5160A] * ( f CLK [Hz]/2 / 2^23 )
 	long speedFromHz(float speedHz) { return (long)(speedHz / ((float)_fclk / (float)(1ul << 24)) * (float)_uStepCount); }
 
-	// Following §14.1 Real world unit conversions
 	// a[Hz/s] = a[5160A] * f CLK [Hz]^2 / (512*256) / 2^24
 	long accelFromHz(float accelHz) { return (long)(accelHz / ((float)_fclk * (float)_fclk / (512.0*256.0) / (float)(1ul<<24)) * (float)_uStepCount); }
 };
