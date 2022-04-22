@@ -1,10 +1,9 @@
 
 #include "SPI_Handler.h"
 #include "wiring_private.h"
-#include "pinDef.h"
 
-#include "TMC/CurtainHandler.h"
 #include "EPD/EPD_Handler.h"
+#include "TMC/CurtainHandler.h"
 #include "Time/TimeHandler.h"
 
 static SPIClassSAMD mySPI(&sercom1, SPI_CIPO, SPI_SCK, SPI_COPI, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_3);
@@ -12,7 +11,7 @@ static CurtainHandler curtainHandler(mySPI);
 static EPD_Handler epdHandler(mySPI);
 static TimeHandler timeHandler;
 
-// Constructor: Initializes non-SPI but comms req pins
+// Constructor: Initializes req pins
 SPI_Handler::SPI_Handler(){
   pinMode(EPD_BUSY_PIN, INPUT);
 

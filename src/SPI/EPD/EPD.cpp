@@ -4,7 +4,11 @@
 #include "imageData.h"
 #include "./SPI/pinDef.h"
 
-EPD::EPD(SPIClass &spi) : _spi(&spi) {
+unsigned char buffer[4736];
+unsigned long width;
+unsigned long height;
+
+EPD::EPD(SPIClass &spi) : spi(&spi) {
   width = EPD_WIDTH;
   height = EPD_HEIGHT;
 };
@@ -14,7 +18,6 @@ void EPD::Init() {
 
   WaitUntilIdle();
   SendCommand(0x12);  // Software reset
-  Serial.println("here");
   WaitUntilIdle();
 
   SendCommand(0x01); // Driver output control
@@ -56,13 +59,13 @@ void EPD::SetFrameMemory(
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
   x &= 0xF8;
   image_width &= 0xF8;
-  if (x + image_width >= this->width) {
-    x_end = this->width - 1;
+  if (x + image_width >= width) {
+    x_end = width - 1;
   } else {
     x_end = x + image_width - 1;
   }
-  if (y + image_height >= this->height) {
-    y_end = this->height - 1;
+  if (y + image_height >= height) {
+    y_end = height - 1;
   } else {
     y_end = y + image_height - 1;
   }
@@ -97,13 +100,13 @@ void EPD::SetFrameMemory_Partial(
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
   x &= 0xF8;
   image_width &= 0xF8;
-  if (x + image_width >= this->width) {
-    x_end = this->width - 1;
+  if (x + image_width >= width) {
+    x_end = width - 1;
   } else {
     x_end = x + image_width - 1;
   }
-  if (y + image_height >= this->height) {
-    y_end = this->height - 1;
+  if (y + image_height >= height) {
+    y_end = height - 1;
   } else {
     y_end = y + image_height - 1;
   }
@@ -165,13 +168,13 @@ void EPD::SetFrameMemory_Base(
   /* x point must be the multiple of 8 or the last 3 bits will be ignored */
   x &= 0xF8;
   image_width &= 0xF8;
-  if (x + image_width >= this->width) {
-    x_end = this->width - 1;
+  if (x + image_width >= width) {
+    x_end = width - 1;
   } else {
     x_end = x + image_width - 1;
   }
-  if (y + image_height >= this->height) {
-    y_end = this->height - 1;
+  if (y + image_height >= height) {
+    y_end = height - 1;
   } else {
     y_end = y + image_height - 1;
   }
@@ -214,26 +217,26 @@ void EPD::SetFrameMemory_Base(
             from the flash).
 */
 void EPD::SetFrameMemory(const unsigned char* image_buffer) {
-  SetMemoryArea(0, 0, this->width - 1, this->height - 1);
+  SetMemoryArea(0, 0, width - 1, height - 1);
   SetMemoryPointer(0, 0);
   SendCommand(0x24);
   /* send the image data */
-  for (unsigned int i = 0; i < this->width / 8 * this->height; i++) {
+  for (unsigned int i = 0; i < width / 8 * height; i++) {
     SendData(pgm_read_byte(&image_buffer[i]));
   }
 }
 
 void EPD::SetFrameMemory_Base(const unsigned char* image_buffer) {
-  SetMemoryArea(0, 0, this->width - 1, this->height - 1);
+  SetMemoryArea(0, 0, width - 1, height - 1);
   SetMemoryPointer(0, 0);
   SendCommand(0x24);
   /* send the image data */
-  for (unsigned int i = 0; i < this->width / 8 * this->height; i++) {
+  for (unsigned int i = 0; i < width / 8 * height; i++) {
     SendData(pgm_read_byte(&image_buffer[i]));
   }
   SendCommand(0x26);
   /* send the image data */
-  for (unsigned int i = 0; i < this->width / 8 * this->height; i++) {
+  for (unsigned int i = 0; i < width / 8 * height; i++) {
     SendData(pgm_read_byte(&image_buffer[i]));
   }
 }
@@ -243,11 +246,11 @@ void EPD::SetFrameMemory_Base(const unsigned char* image_buffer) {
             this won't update the display.
 */
 void EPD::ClearFrameMemory(unsigned char color) {
-  SetMemoryArea(0, 0, this->width - 1, this->height - 1);
+  SetMemoryArea(0, 0, width - 1, height - 1);
   SetMemoryPointer(0, 0);
   SendCommand(0x24);
   /* send the color data */
-  for (unsigned int i = 0; i < this->width / 8 * this->height; i++) {
+  for (unsigned int i = 0; i < width / 8 * height; i++) {
     SendData(color);
   }
 }
@@ -338,7 +341,7 @@ void EPD::Sleep() {
 void EPD::SendCommand(unsigned char command) {
   digitalWrite(EPD_DC_PIN, LOW);
   digitalWrite(EPD_CS_PIN, LOW);
-  _spi->transfer(command);
+  spi->transfer(command);
   digitalWrite(EPD_CS_PIN, HIGH);
 }
 
@@ -346,7 +349,7 @@ void EPD::SendCommand(unsigned char command) {
 void EPD::SendData(unsigned char dat) {
   digitalWrite(EPD_DC_PIN, HIGH);
   digitalWrite(EPD_CS_PIN, LOW);
-  _spi->transfer(dat);
+  spi->transfer(dat);
   digitalWrite(EPD_CS_PIN, HIGH);
 }
 

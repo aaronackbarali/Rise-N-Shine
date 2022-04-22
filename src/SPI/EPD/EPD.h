@@ -10,11 +10,9 @@
 
 class EPD {
   public:
-    unsigned char buffer[4736];
-    unsigned long width;
-    unsigned long height;
+    SPIClass *spi;
 
-    EPD(SPIClass& spi = SPI);
+    EPD(SPIClass &spi);
     void Init();
     void SendCommand(unsigned char command);
     void SendData(unsigned char data);
@@ -47,10 +45,6 @@ class EPD {
     void DisplayFrame();
     void DisplayFrame_Partial();
     void Sleep();
-
-  private:
-    SPIClass *_spi;
-
     void SetLut(unsigned char *lut);
     void SetLut_by_host(unsigned char *lut);
     void SetMemoryArea(int x_start, int y_start, int x_end, int y_end);

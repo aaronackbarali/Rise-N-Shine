@@ -7,8 +7,9 @@ static SPI_Handler spi_Handler;
 static int fullRefreshTrigger = 0;
 static int vNow = 0;    // time HHMM
 static int delta = 2;   // alarm window = vNow +/- delta
-static int alarm = 855; // alarm time 24h format HHMM
 static String vNowFmtd = "00:00"; // time formatted HH:MM
+
+static const int alarm = 855; // alarm time 24h format HHMM
 
 void setup() {
   delay(10000);
@@ -40,9 +41,4 @@ void loop() {
     spi_Handler.openCurtains();
     fullRefreshTrigger = 5;
   }
-
-  spi_Handler.openCurtains();
-
-  Serial.println("exiting loop");
-
 }
