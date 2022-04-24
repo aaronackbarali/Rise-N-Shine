@@ -15,8 +15,8 @@ class EPD_Handler{
     // Method: Initializes and clears display
     void initializeDisplay();
 
-    // Method: Prints a string, font 64pt
-    void print64(String str, bool full);
+    // Method: Prints a string, font 64pt. Refreshes every 5th print
+    void print64(String str);
 };
 
 #endif

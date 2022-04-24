@@ -6,18 +6,23 @@
 #define UNCOLORED   0
 
 Paint paint;
+int printCount = 0;
 
 // Constructor:
 EPD_Handler::EPD_Handler(SPIClass &spi) : epd(spi) {
 }
 
+// Method: Initializes and clears display
 void EPD_Handler::initializeDisplay(){
   epd.Init();
   epd.ClearFrameMemory(0xFF);
   epd.DisplayFrame();
 }
 
-void EPD_Handler::print64(String str, bool full){
+// Method: Prints a string, font 64pt. Refreshes every 5th print
+void EPD_Handler::print64(String str){
+  printCount++;
+
   epd.Init();
 
   paint.SetRotate(ROTATE_90);
@@ -27,9 +32,10 @@ void EPD_Handler::print64(String str, bool full){
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 0, str, &fontLS_64, COLORED);
 
-  if (full) {
+  if (printCount == 5) {
     epd.SetFrameMemory(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame();
+    printCount = 0;
   } else {
     epd.SetFrameMemory_Partial(paint.GetImage(), 0, 0, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame_Partial();

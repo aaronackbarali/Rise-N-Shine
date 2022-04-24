@@ -26,7 +26,7 @@ class SPI_Handler {
     void initializeDisplay();
 
     // Method: Prints string, 64pt. Boolean for full or patrial refresh
-    void print64(String str, bool full);
+    void print64(String str);
 };
 
 #endif

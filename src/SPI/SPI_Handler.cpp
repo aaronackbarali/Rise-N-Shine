@@ -70,10 +70,10 @@ void SPI_Handler::initializeDisplay(){
 }
 
 // Method: Prints string, 64pt. Boolean for full or patrial refresh
-void SPI_Handler::print64(String str, bool full){
+void SPI_Handler::print64(String str){
   mySPI.beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
 
-  epdHandler.print64(str, full);
+  epdHandler.print64(str);
 
   mySPI.endTransaction();
 }
