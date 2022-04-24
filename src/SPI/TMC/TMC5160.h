@@ -13,7 +13,7 @@ public:
 	static constexpr uint8_t IC_VERSION = 0x30;
 	static constexpr uint32_t DEFAULT_F_CLK = 12000000; // Typical internal clock frequency in Hz.
 
-	enum MotorDirection { NORMAL_MOTOR_DIRECTION =	0x00, INVERSE_MOTOR_DIRECTION = 0x1 };
+	enum MotorDirection { NORMAL_MOTOR_DIRECTION = 0x00, INVERSE_MOTOR_DIRECTION = 0x1 };
 	enum RampMode { POSITIONING_MODE, VELOCITY_MODE, HOLD_MODE };
 
 	struct PowerStageParameters {
@@ -44,7 +44,7 @@ public:
 	 * motorParams : motor current parameters
 	 * stepperDirection : normal / inverted
 	 */
-	virtual bool begin(const PowerStageParameters &powerParams, const MotorParameters &motorParams, MotorDirection stepperDirection);
+	bool begin(const PowerStageParameters &powerParams, const MotorParameters &motorParams, MotorDirection stepperDirection);
 
 
 	/* Ramp mode selection :

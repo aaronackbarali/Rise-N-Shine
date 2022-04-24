@@ -4,8 +4,8 @@
 #include "DST_LUT.h"
 
 // EDT from second Sunday in March to first Sunday in November
-const int EDT_Offset = -14400; // UTC-4 hours
-const int EST_Offset = -18000; // UTC-5 hours
+constexpr int EDT_Offset = -14400; // UTC-4 hours
+constexpr int EST_Offset = -18000; // UTC-5 hours
 
 // Method: Return the epoch
 unsigned long TimeHandler::getEpochTime() {

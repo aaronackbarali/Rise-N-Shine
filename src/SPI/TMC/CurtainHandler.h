@@ -9,7 +9,7 @@ class CurtainHandler{
   public:
   	TMC5160 motor;
 
-    //  Constructor:
+    // Constructor: calls motor constructor
     CurtainHandler(SPIClass &spi);
 
     // Method: Opens curtains

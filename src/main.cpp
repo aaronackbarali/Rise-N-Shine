@@ -6,7 +6,7 @@ static SPI_Handler spi_Handler;
 static int vNow = 0;    // time HHMM
 static int delta = 2;   // alarm window = vNow +/- delta
 
-static const int alarm = 855; // alarm time 24h format HHMM
+static constexpr int alarm = 855; // alarm time 24h format HHMM
 
 void setup() {
   delay(10000);
