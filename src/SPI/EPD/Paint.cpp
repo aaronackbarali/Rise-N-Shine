@@ -5,7 +5,7 @@ unsigned char* Paint::GetImage() {
   return this->image;
 }
 
-int Paint::GetWidth(void) {
+int Paint::GetWidth() {
   return this->width;
 }
 
@@ -13,16 +13,12 @@ void Paint::SetWidth(int width) {
   this->width = width % 8 ? width + 8 - (width % 8) : width;
 }
 
-int Paint::GetHeight(void) {
+int Paint::GetHeight() {
   return this->height;
 }
 
 void Paint::SetHeight(int height) {
   this->height = height;
-}
-
-int Paint::GetRotate(void) {
-  return this->rotate;
 }
 
 void Paint::SetRotate(int rotate) {
@@ -113,9 +109,9 @@ void Paint::DrawStringAt(int x, int y, String text, sFONT* font, int colored) {
    int refcolumn = x;
 
   // Send the string character by character on EPD
-  for (unsigned int i = 0; i < text.length();i++) {
+  for (unsigned int i = 0; i < text.length(); i++) {
     DrawCharAt(refcolumn, y, text.charAt(i), font, colored);
-    refcolumn += font->Width;     // Decrement the column position by 16
+    refcolumn += font->Width;     // Move the cursor
   }
 }
 

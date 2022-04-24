@@ -18,11 +18,10 @@ public:
     int height = 0;
     int rotate = ROTATE_0;
 
-    int  GetWidth(void);
+    int  GetWidth();
     void SetWidth(int width);
-    int  GetHeight(void);
+    int  GetHeight();
     void SetHeight(int height);
-    int  GetRotate(void);
     void SetRotate(int rotate);
     unsigned char* GetImage();
     void DrawAbsolutePixel(int x, int y, int colored);

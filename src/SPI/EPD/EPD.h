@@ -13,11 +13,14 @@ class EPD {
     SPIClass *spi;
 
     EPD(SPIClass &spi);
-    void Init();
+
     void SendCommand(unsigned char command);
     void SendData(unsigned char data);
     void WaitUntilIdle();
     void Reset();
+    void Init();
+    void Sleep();
+
     void SetFrameMemory(
       const unsigned char* image_buffer,
       unsigned int x,
@@ -39,12 +42,10 @@ class EPD {
       unsigned int image_width,
       unsigned int image_height
     );
-    void SetFrameMemory(const unsigned char* image_buffer);
-    void SetFrameMemory_Base(const unsigned char* image_buffer);
     void ClearFrameMemory(unsigned char color);
     void DisplayFrame();
     void DisplayFrame_Partial();
-    void Sleep();
+
     void SetLut(unsigned char *lut);
     void SetLut_by_host(unsigned char *lut);
     void SetMemoryArea(int x_start, int y_start, int x_end, int y_end);

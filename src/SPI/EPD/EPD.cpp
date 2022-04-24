@@ -13,6 +13,43 @@ EPD::EPD(SPIClass &spi) : spi(&spi) {
   height = EPD_HEIGHT;
 };
 
+// Method: Send a command to the EPD
+void EPD::SendCommand(unsigned char command) {
+  digitalWrite(EPD_DC_PIN, LOW);
+  digitalWrite(EPD_CS_PIN, LOW);
+  spi->transfer(command);
+  digitalWrite(EPD_CS_PIN, HIGH);
+}
+
+// Method: Send a byte of data to the EPD
+void EPD::SendData(unsigned char dat) {
+  digitalWrite(EPD_DC_PIN, HIGH);
+  digitalWrite(EPD_CS_PIN, LOW);
+  spi->transfer(dat);
+  digitalWrite(EPD_CS_PIN, HIGH);
+}
+
+// Method: Wait until the busy_pin goes LOW
+void EPD::WaitUntilIdle() {
+  while (1) {	 //=1 BUSY
+    if (digitalRead(EPD_BUSY_PIN) == LOW)
+      break;
+    delay(5);
+  }
+  delay(5);
+}
+
+// Method: Module reset. Used to awaken the module in deep sleep. See Epd::Sleep();
+void EPD::Reset() {
+  digitalWrite(EPD_RST_PIN, HIGH);
+  delay(20);
+  digitalWrite(EPD_RST_PIN, LOW);
+  delay(5);
+  digitalWrite(EPD_RST_PIN, HIGH);
+  delay(20);
+}
+
+// Method: Wakes and initializes display
 void EPD::Init() {
   Reset();
 
@@ -37,6 +74,12 @@ void EPD::Init() {
   WaitUntilIdle();
 
   SetLut_by_host(WS_20_30);
+}
+
+// Method: Enter deep sleep. Use Init() to wake
+void EPD::Sleep() {
+  SendCommand(0x10);
+  SendData(0x01);
 }
 
 // Method: sets frame memory on epd ram
@@ -200,48 +243,6 @@ void EPD::SetFrameMemory_Base(
 }
 
 /**
-    @brief: put an image buffer to the frame memory.
-            this won't update the display.
-
-            Question: When do you use this function instead of
-            void SetFrameMemory(
-                const unsigned char* image_buffer,
-                int x,
-                int y,
-                int image_width,
-                int image_height
-            );
-            Answer: SetFrameMemory with parameters only reads image data
-            from the RAM but not from the flash in AVR chips (for AVR chips,
-            you have to use the function pgm_read_byte to read buffers
-            from the flash).
-*/
-void EPD::SetFrameMemory(const unsigned char* image_buffer) {
-  SetMemoryArea(0, 0, width - 1, height - 1);
-  SetMemoryPointer(0, 0);
-  SendCommand(0x24);
-  /* send the image data */
-  for (unsigned int i = 0; i < width / 8 * height; i++) {
-    SendData(pgm_read_byte(&image_buffer[i]));
-  }
-}
-
-void EPD::SetFrameMemory_Base(const unsigned char* image_buffer) {
-  SetMemoryArea(0, 0, width - 1, height - 1);
-  SetMemoryPointer(0, 0);
-  SendCommand(0x24);
-  /* send the image data */
-  for (unsigned int i = 0; i < width / 8 * height; i++) {
-    SendData(pgm_read_byte(&image_buffer[i]));
-  }
-  SendCommand(0x26);
-  /* send the image data */
-  for (unsigned int i = 0; i < width / 8 * height; i++) {
-    SendData(pgm_read_byte(&image_buffer[i]));
-  }
-}
-
-/**
     @brief: clear the frame memory with the specified color.
             this won't update the display.
 */
@@ -324,51 +325,4 @@ void EPD::SetMemoryPointer(int x, int y) {
   SendData(y & 0xFF);
   SendData((y >> 8) & 0xFF);
   WaitUntilIdle();
-}
-
-/**
-    @brief: After this command is transmitted, the chip would enter the
-            deep-sleep mode to save power.
-            The deep sleep mode would return to standby by hardware reset.
-            You can use EPD::Init() to awaken
-*/
-void EPD::Sleep() {
-  SendCommand(0x10);
-  SendData(0x01);
-}
-
-// Method: Send a command to the EPD
-void EPD::SendCommand(unsigned char command) {
-  digitalWrite(EPD_DC_PIN, LOW);
-  digitalWrite(EPD_CS_PIN, LOW);
-  spi->transfer(command);
-  digitalWrite(EPD_CS_PIN, HIGH);
-}
-
-// Method: Send a byte of data to the EPD
-void EPD::SendData(unsigned char dat) {
-  digitalWrite(EPD_DC_PIN, HIGH);
-  digitalWrite(EPD_CS_PIN, LOW);
-  spi->transfer(dat);
-  digitalWrite(EPD_CS_PIN, HIGH);
-}
-
-// Method: Module reset. Used to awaken the module in deep sleep. See Epd::Sleep();
-void EPD::Reset() {
-  digitalWrite(EPD_RST_PIN, HIGH);
-  delay(20);
-  digitalWrite(EPD_RST_PIN, LOW);
-  delay(5);
-  digitalWrite(EPD_RST_PIN, HIGH);
-  delay(20);
-}
-
-// Method: Wait until the busy_pin goes LOW
-void EPD::WaitUntilIdle() {
-  while (1) {	 //=1 BUSY
-    if (digitalRead(EPD_BUSY_PIN) == LOW)
-      break;
-    delay(5);
-  }
-  delay(5);
 }
