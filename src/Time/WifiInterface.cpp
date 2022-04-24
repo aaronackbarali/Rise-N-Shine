@@ -14,21 +14,11 @@ int WiFiInterface::connectToWifi() {
   return 1; // Wifi failed to connect
 }
 
-// Disconnect Wifi. Stop udp client. Hardcoded delay of 3s
+// Disconnect Wifi. Stop udp client.
 void WiFiInterface::disconnectFromWifi() {
-  ntpUDP.stop();
-  delay(1000);
-
   if (WiFi.status() == WL_CONNECTED) {
+    ntpUDP.stop();
     WiFi.disconnect();
-    delay(1000);
+    WiFi.end();
   }
-
-  WiFi.end();
-  delay(1000);
-}
-
-// Get WiFi status. 1 is connected, 0 otherwise.
-int WiFiInterface::getWifiStatus(){
-  return WiFi.status() == WL_CONNECTED ? 1 : 0;
 }

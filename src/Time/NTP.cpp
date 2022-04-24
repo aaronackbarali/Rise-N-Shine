@@ -7,29 +7,18 @@
 byte _packetBuffer[NTP_PACKET_SIZE];
 IPAddress _poolServerIP = IPAddress(192, 168, 1, 11); // Synology IP address
 
-// Get NTP Epoch
+// Method: Get NTP Epoch by looping getNTPTime()
 void NTP::updateTime(boolean startup) {
-  connectToWifi();
+  if (connectToWifi() == 0) { // WiFi connected returns 0
+    // When starting up, loop until time is retrieved, else try 10 times
+    for (byte i = 0; i < 10; startup ? i = 0 : i++) {
+      if (getNTPTime()) {
+        break;
+      }
+    }
 
-  // When starting up, loop until time is retrieved
-  if (startup) {
-    while (true) {
-      if (getNTPTime()) {
-        break;
-      }
-      delay(1000);
-    }
-  } else {
-    // Try getting time 10 times
-    for (byte i = 0; i < 10; i++) {
-      if (getNTPTime()) {
-        break;
-      }
-      delay(1000);
-    }
+    disconnectFromWifi();
   }
-
-  disconnectFromWifi();
 }
 
 boolean NTP::getNTPTime() {
@@ -43,14 +32,13 @@ boolean NTP::getNTPTime() {
   byte timeout = 0;
   int cb = ntpUDP.parsePacket();
 
-  // Retry 100 times then timeout after 10s
+  // Retry 100 times then timeout (10 seconds)
   while (cb == 0) {
     delay(100);
 
     cb = ntpUDP.parsePacket();
 
     if (timeout > 100) {
-      //digitalWrite(errorBit1, HIGH);
       return false;
     }
 
@@ -68,7 +56,6 @@ boolean NTP::getNTPTime() {
 
   _currentEpoc = secsSince1900 - SEVENTYYEARS;
 
-  // digitalWrite(errorBit1, LOW); // Clear errors if any
   return true;
 }
 

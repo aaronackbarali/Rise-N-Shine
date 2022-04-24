@@ -9,11 +9,13 @@ public:
   unsigned long _currentEpoc    = 0; // In s
   unsigned long _lastUpdate     = 0; // In ms
 
-  // Get NTP Epoch
+  // Method: Get NTP Epoch by looping getNTPTime()
   void updateTime(boolean startup);
 
+  // Method: Get
   boolean getNTPTime();
 
+  // Method:
   void sendNTPPacket();
 };
 
